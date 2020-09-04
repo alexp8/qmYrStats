@@ -25,4 +25,7 @@ hs_err_pid*
 #intellij
 .idea
 .iml
-.json
+*.json
+*.iml
+
+/target
