@@ -18,16 +18,15 @@ public class QMReportMain {
 
     public static void main(String... args) throws IOException {
 
-        String filename = args[0];
-
-        Path path = Paths.get("src/main/resources/" + filename);
+        Path[] paths = new Path[]{Paths.get("src/main/resources/october_bulk.json")};
 
         QMReportParser qmReportParser = new QMReportParser();
-//        qmReportParser.parseYRReportsByMatchup(Files.newBufferedReader(file));
 
-//        qmReportParser.parseYRReportsByMap(Files.newBufferedReader(file));
+        QMReport.YRReport[] yrReports_filtered = QMPlayerFilter.filterPlayers(paths, 15); //filter out games that disconnected, and any games played by player with less than 15 total played games
 
-        QMReport.YRReport[] yrReports_filtered = QMPlayerFilter.filterPlayers(Files.newBufferedReader(path), 10);
+        qmReportParser.parseYRReportsByMatchup(yrReports_filtered);
+
+        qmReportParser.parseYRReportsByMap(yrReports_filtered);
 
         QMElo.generateElo(yrReports_filtered, 1000);
     }

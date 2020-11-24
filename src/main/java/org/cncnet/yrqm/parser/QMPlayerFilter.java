@@ -1,12 +1,16 @@
 package org.cncnet.yrqm.parser;
 
 import com.google.gson.Gson;
-import org.cncnet.yrqm.model.QMReport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cncnet.yrqm.model.QMReport;
 
-import java.io.Reader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,15 +24,21 @@ public class QMPlayerFilter {
      * @param numGamesPlayed filter out players who do not have this many games played
      * @return the list of filtered YR reports
      */
-    public static QMReport.YRReport[] filterPlayers(Reader reader, int numGamesPlayed) {
+    public static QMReport.YRReport[] filterPlayers(Path[] paths, int numGamesPlayed) throws IOException {
         Gson gson = new Gson();
 
-        QMReport.YRReport[] yrReports = gson.fromJson(reader, QMReport.class).getYr(); //parse JSON content into Java objects, hold as array of YR reports
-        logger.info(yrReports.length + " YR reports found in input json");
+        List<QMReport.YRReport> yrReports = new ArrayList<>();
 
-        HashMap<String, Integer> yrReportsPerPlayer = new HashMap<>();
+        for (Path path : paths) { //parse all json files and gather the reports
+            BufferedReader reader = Files.newBufferedReader(path);
+            QMReport.YRReport[] yrReports1 = gson.fromJson(reader, QMReport.class).getYr(); //parse JSON content into Java objects, hold as array of YR reports
+            logger.info(yrReports1.length + " YR reports found in input json");
+            yrReports.addAll(Arrays.asList(yrReports1));
+        }
 
-        for (QMReport.YRReport yrReport : yrReports) { //loop through all YR reports
+        HashMap<String, Integer> yrReportsPerPlayer = new HashMap<>();  //key = player name, value = # games played
+
+        for (QMReport.YRReport yrReport : yrReports) { //loop through all YR reports, sum up all games played per player
 
             if (yrReport.getPlayers() == null || yrReport.getPlayers().length < 2) //skip any report missing player info
                 continue;
@@ -58,7 +68,7 @@ public class QMPlayerFilter {
 
         List<QMReport.YRReport> filteredReports = new ArrayList<>();
 
-        for (QMReport.YRReport yrReport : yrReports) {
+        for (QMReport.YRReport yrReport : yrReports) { //filter out games
             if (yrReport.getPlayers() == null || yrReport.getPlayers().length < 2) //skip any report missing player info
                 continue;
 

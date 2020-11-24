@@ -6,7 +6,10 @@ import org.cncnet.yrqm.model.QMReport;
 import org.cncnet.yrqm.model.enums.YRFactionEnum;
 
 import java.io.Reader;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 
@@ -31,7 +34,6 @@ public class QMElo {
 
     /**
      * Calculate the elo rankings
-     *
      */
     public static void generateElo(QMReport.YRReport[] yrReports, int numIterations) {
 
@@ -47,6 +49,14 @@ public class QMElo {
 
 
         /* ** Print out the elo rankings ** */
+        printSideElo(); //print the overall Elo results of a side
+
+        printSideMapElo(); //print the Elo results of a side playing on a map
+
+        printSideMapVsSideElo(); //print the Elo results of a side playing on a map vs specific faction matchup
+    }
+
+    private static void printSideElo() {
         double avgElo = (double) sideElo_HashMap.values().stream().mapToInt(Double::intValue).sum() / sideElo_HashMap.values().size();
         System.out.println("-Average elo: " + avgElo);
         for (String key : sideElo_HashMap.keySet()) {
@@ -54,20 +64,50 @@ public class QMElo {
         }
 
         System.out.println();
+    }
 
+    private static void printSideMapVsSideElo() {
+        double avgElo;
+        avgElo = (double) sideVsSideMap_HashMap.values().
+
+                stream().
+
+                mapToInt(Double::intValue).
+
+                sum() / sideVsSideMap_HashMap.values().
+
+                size();
+        System.out.println("-Average elo: " + avgElo);
+        for (
+                String key : sideVsSideMap_HashMap.keySet()) {
+            System.out.println(key + ": " + sideVsSideMap_HashMap.get(key));
+        }
+    }
+
+    private static void printSideMapElo() {
+        double avgElo;
         avgElo = (double) sideMapElo_HashMap.values().stream().mapToInt(Double::intValue).sum() / sideMapElo_HashMap.values().size();
         System.out.println("-Average elo: " + avgElo);
-        for (String key : sideMapElo_HashMap.keySet()) {
+
+        //sort all of the ratings, allied elo ratings and then soviet
+        List<String> alliedKeys = sideMapElo_HashMap.keySet().stream().filter(x -> x.contains("Allied")).collect(Collectors.toList());
+        List<String> sovietKeys = sideMapElo_HashMap.keySet().stream().filter(x -> x.contains("Soviet")).collect(Collectors.toList());
+
+        alliedKeys = alliedKeys.stream().sorted(Comparator.comparing(sideMapElo_HashMap::get)).collect(Collectors.toList());
+
+        sovietKeys = sovietKeys.stream().sorted(Comparator.comparing(sideMapElo_HashMap::get)).collect(Collectors.toList());
+
+        for (String key : alliedKeys) {
             System.out.println(key + ": " + sideMapElo_HashMap.get(key));
         }
 
         System.out.println();
 
-        avgElo = (double) sideVsSideMap_HashMap.values().stream().mapToInt(Double::intValue).sum() / sideVsSideMap_HashMap.values().size();
-        System.out.println("-Average elo: " + avgElo);
-        for (String key : sideVsSideMap_HashMap.keySet()) {
-            System.out.println(key + ": " + sideVsSideMap_HashMap.get(key));
+        for (String key : sovietKeys) {
+            System.out.println(key + ": " + sideMapElo_HashMap.get(key));
         }
+
+        System.out.println("\n");
     }
 
     private static void calculateElo(QMReport.YRReport[] yrReports) {

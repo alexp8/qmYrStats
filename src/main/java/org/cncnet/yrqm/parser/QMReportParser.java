@@ -26,13 +26,9 @@ public class QMReportParser {
     /**
      * Calculate the stats for every matchup in every map.
      *
-     * @param reader
+     * @param yrReports
      */
-    public void parseYRReportsByMap(Reader reader) {
-        Gson gson = new Gson();
-
-        QMReport.YRReport[] yrReports = gson.fromJson(reader, QMReport.class).getYr();
-
+    public void parseYRReportsByMap(QMReport.YRReport[] yrReports) {
         HashMap<String, List<QMReport.YRReport>> reportsOrganizedByMap = getYRReportsByMap(yrReports);
 
         List<YRCompiledReport> yrCompiledReports = compileYRReportsByMap(reportsOrganizedByMap); //calculate the matchup statistics for every map
@@ -76,7 +72,7 @@ public class QMReportParser {
     /**
      * Given a list of YRReports, organize them into a map, each key being a map name
      *
-     * @param yrReports
+     * @param yrReports Yuri's revenge QM reports
      * @return a hashmap containing all of the YRReports organized by map name
      */
     private HashMap<String, List<QMReport.YRReport>> getYRReportsByMap(QMReport.YRReport[] yrReports) {
@@ -102,11 +98,7 @@ public class QMReportParser {
         return reportsOrganizedByMap;
     }
 
-    public void parseYRReportsByMatchup(Reader reader) {
-        Gson gson = new Gson();
-
-        QMReport.YRReport[] yrReports = gson.fromJson(reader, QMReport.class).getYr(); //parse JSON content into Java objects, hold as array of YR reports
-
+    public void parseYRReportsByMatchup(QMReport.YRReport[] yrReports) {
         List<YRCompiledReport> reportsOrganizedByMatchup = getYRReportsByMatchup(yrReports); //Compile the reports into a list based on matchups
 
         int totalGames = reportsOrganizedByMatchup.stream().filter(x -> x.getTotalGames() > 0).mapToInt(YRCompiledReport::getTotalGames).sum() + mirrorMatches;
