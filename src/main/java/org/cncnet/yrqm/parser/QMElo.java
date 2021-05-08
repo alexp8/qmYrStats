@@ -6,18 +6,16 @@ import org.cncnet.yrqm.model.QMReport;
 import org.cncnet.yrqm.model.enums.YRFactionEnum;
 
 import java.io.Reader;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 
 public class QMElo {
 
-    private static final HashMap<String, Double> sideElo_HashMap = new HashMap<>();  //key would be like "Soviet"
-    private static final HashMap<String, Double> sideMapElo_HashMap = new HashMap<>(); //key would be like "Divide And Conquer: Soviet"
-    private static final HashMap<String, Double> sideVsSideMap_HashMap = new HashMap<>(); //key would be like "Divide And Conquer: Soviet vs Allies"
+    private static final TreeMap<String, Double> sideElo_HashMap = new TreeMap<>();  //key would be like "Soviet"
+    private static final TreeMap<String, Double> sideMapElo_HashMap = new TreeMap<>(); //key would be like "Divide And Conquer: Soviet"
+    private static final TreeMap<String, Double> sideVsSideMap_HashMap = new TreeMap<>(); //key would be like "Divide And Conquer: Soviet vs Allies"
 
     private static final YRConfig yrConfig = new YRConfig();
 
@@ -59,6 +57,7 @@ public class QMElo {
     private static void printSideElo() {
         double avgElo = (double) sideElo_HashMap.values().stream().mapToInt(Double::intValue).sum() / sideElo_HashMap.values().size();
         System.out.println("-Average elo: " + avgElo);
+
         for (String key : sideElo_HashMap.keySet()) {
             System.out.println(key + ": " + sideElo_HashMap.get(key));
         }
@@ -186,7 +185,7 @@ public class QMElo {
         calculateSideElo(sideVsSideMap_HashMap, key1, key2);
     }
 
-    private static void calculateSideElo(HashMap<String, Double> map, String key1, String key2) {
+    private static void calculateSideElo(TreeMap<String, Double> map, String key1, String key2) {
         map.putIfAbsent(key1, BASE_ELO);
         map.putIfAbsent(key2, BASE_ELO);
 

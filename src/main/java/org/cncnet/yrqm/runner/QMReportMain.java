@@ -18,7 +18,7 @@ public class QMReportMain {
 
     public static void main(String... args) throws IOException {
 
-        Path[] paths = new Path[]{Paths.get("src/main/resources/october_bulk.json")};
+        Path[] paths = new Path[]{Paths.get("src/main/resources/april_bulk.json")};
 
         QMReportParser qmReportParser = new QMReportParser();
 

@@ -11,6 +11,7 @@ import org.cncnet.yrqm.model.reports.YRSovVsYuriReport;
 
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,6 +33,8 @@ public class QMReportParser {
         HashMap<String, List<QMReport.YRReport>> reportsOrganizedByMap = getYRReportsByMap(yrReports);
 
         List<YRCompiledReport> yrCompiledReports = compileYRReportsByMap(reportsOrganizedByMap); //calculate the matchup statistics for every map
+
+        Collections.sort(yrCompiledReports); //sort by Standard maps
 
         yrCompiledReports.forEach(System.out::println);
 
