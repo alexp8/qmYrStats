@@ -3,6 +3,7 @@ package org.cncnet.yrqm.parser;
 import com.google.gson.Gson;
 import org.cncnet.yrqm.config.YRConfig;
 import org.cncnet.yrqm.model.QMReport;
+import org.cncnet.yrqm.model.YRComparator;
 import org.cncnet.yrqm.model.enums.YRFactionEnum;
 
 import java.io.Reader;
@@ -13,9 +14,9 @@ import static java.lang.Math.*;
 
 public class QMElo {
 
-    private static final TreeMap<String, Double> sideElo_HashMap = new TreeMap<>();  //key would be like "Soviet"
-    private static final TreeMap<String, Double> sideMapElo_HashMap = new TreeMap<>(); //key would be like "Divide And Conquer: Soviet"
-    private static final TreeMap<String, Double> sideVsSideMap_HashMap = new TreeMap<>(); //key would be like "Divide And Conquer: Soviet vs Allies"
+    private static final TreeMap<String, Double> sideElo_HashMap = new TreeMap<>(new YRComparator());  //key would be like "Soviet"
+    private static final TreeMap<String, Double> sideMapElo_HashMap = new TreeMap<>(new YRComparator()); //key would be like "Divide And Conquer: Soviet"
+    private static final TreeMap<String, Double> sideVsSideMap_HashMap = new TreeMap<>(new YRComparator()); //key would be like "Divide And Conquer: Soviet vs Allies"
 
     private static final YRConfig yrConfig = new YRConfig();
 

@@ -84,7 +84,7 @@ public class QMPlayerFilter {
             }
         }
 
-        logger.info("Filtered down to " + filteredReports.size() + " reports, players who did not have " + numGamesPlayed + " games played");
+        logger.info("Filtered down to " + filteredReports.size() + " reports, players who did not have " + numGamesPlayed + " games played removed from dataset");
 
         return filteredReports.toArray(new QMReport.YRReport[0]);
     }

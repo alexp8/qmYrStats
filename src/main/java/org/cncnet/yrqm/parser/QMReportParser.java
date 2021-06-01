@@ -1,19 +1,15 @@
 package org.cncnet.yrqm.parser;
 
-import com.google.gson.Gson;
 import org.cncnet.yrqm.config.YRConfig;
 import org.cncnet.yrqm.model.QMReport;
 import org.cncnet.yrqm.model.YRCompiledReport;
+import org.cncnet.yrqm.model.YRComparator;
 import org.cncnet.yrqm.model.enums.YRFactionEnum;
 import org.cncnet.yrqm.model.reports.YRAlliedVsYuriReport;
 import org.cncnet.yrqm.model.reports.YRSovVsAlliedReport;
 import org.cncnet.yrqm.model.reports.YRSovVsYuriReport;
 
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class QMReportParser {
 
@@ -179,5 +175,29 @@ public class QMReportParser {
             } else
                 mirrorMatches++;
         }
+    }
+
+    public void generateTotalGamesPlayedPerMap(QMReport.YRReport[] yrReports_filtered) {
+
+        TreeMap<String, Integer> mapCounts = new TreeMap<>(new YRComparator());
+
+        for (QMReport.YRReport report : yrReports_filtered) {
+            String mapName = report.getScen();
+
+            if (mapCounts.containsKey(mapName)) {
+                int count = mapCounts.get(mapName) + 1;
+                mapCounts.put(mapName, count);
+            } else {
+                mapCounts.put(mapName, 1);
+            }
+        }
+
+        System.out.println("Games played per map");
+        System.out.println("");
+
+        for (String mapName : mapCounts.keySet()) {
+            System.out.println(mapName + ": " + mapCounts.get(mapName));
+        }
+        System.out.println("");
     }
 }
