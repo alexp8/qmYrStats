@@ -6,7 +6,7 @@ import java.util.Comparator;
  * Primary Sort: Standard maps first
  * Secondary Sort: alphabetical
  */
-public class YRComparator implements Comparator<String> {
+public class YRMapComparator implements Comparator<String> {
 
     /**
      * Compare two map names

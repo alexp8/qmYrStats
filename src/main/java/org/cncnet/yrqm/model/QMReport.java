@@ -35,6 +35,7 @@ public class QMReport {
             private int won;
             private int defeated;
             private int country;
+            private int points;
             private String side;
         }
     }

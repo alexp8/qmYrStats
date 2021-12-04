@@ -3,7 +3,7 @@ package org.cncnet.yrqm.parser;
 import com.google.gson.Gson;
 import org.cncnet.yrqm.config.YRConfig;
 import org.cncnet.yrqm.model.QMReport;
-import org.cncnet.yrqm.model.YRComparator;
+import org.cncnet.yrqm.model.YRMapComparator;
 import org.cncnet.yrqm.model.enums.YRFactionEnum;
 
 import java.io.Reader;
@@ -14,9 +14,9 @@ import static java.lang.Math.*;
 
 public class QMElo {
 
-    private static final TreeMap<String, Double> sideElo_HashMap = new TreeMap<>(new YRComparator());  //key would be like "Soviet"
-    private static final TreeMap<String, Double> sideMapElo_HashMap = new TreeMap<>(new YRComparator()); //key would be like "Divide And Conquer: Soviet"
-    private static final TreeMap<String, Double> sideVsSideMap_HashMap = new TreeMap<>(new YRComparator()); //key would be like "Divide And Conquer: Soviet vs Allies"
+    private static final TreeMap<String, Double> sideElo_HashMap = new TreeMap<>(new YRMapComparator());  //key would be like "Soviet"
+    private static final TreeMap<String, Double> sideMapElo_HashMap = new TreeMap<>(new YRMapComparator()); //key would be like "Divide And Conquer: Soviet"
+    private static final TreeMap<String, Double> sideVsSideMap_HashMap = new TreeMap<>(new YRMapComparator()); //key would be like "Divide And Conquer: Soviet vs Allies"
 
     private static final YRConfig yrConfig = new YRConfig();
 
@@ -92,18 +92,26 @@ public class QMElo {
         //sort all of the ratings, allied elo ratings and then soviet
         List<String> alliedKeys = sideMapElo_HashMap.keySet().stream().filter(x -> x.contains("Allied")).collect(Collectors.toList());
         List<String> sovietKeys = sideMapElo_HashMap.keySet().stream().filter(x -> x.contains("Soviet")).collect(Collectors.toList());
+        List<String> yuriKeys = sideMapElo_HashMap.keySet().stream().filter(x -> x.contains("Yuri")).collect(Collectors.toList());
 
         alliedKeys = alliedKeys.stream().sorted(Comparator.comparing(sideMapElo_HashMap::get)).collect(Collectors.toList());
-
         sovietKeys = sovietKeys.stream().sorted(Comparator.comparing(sideMapElo_HashMap::get)).collect(Collectors.toList());
+        yuriKeys = yuriKeys.stream().sorted(Comparator.comparing(sideMapElo_HashMap::get)).collect(Collectors.toList());
 
+        System.out.println("=====Allied=====");
         for (String key : alliedKeys) {
             System.out.println(key + ": " + sideMapElo_HashMap.get(key));
         }
 
-        System.out.println();
+        System.out.println("=====Soviet=====");
 
         for (String key : sovietKeys) {
+            System.out.println(key + ": " + sideMapElo_HashMap.get(key));
+        }
+
+        System.out.println("=====Yuri=====");
+
+        for (String key : yuriKeys) {
             System.out.println(key + ": " + sideMapElo_HashMap.get(key));
         }
 

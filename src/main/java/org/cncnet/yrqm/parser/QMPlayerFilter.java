@@ -9,10 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class QMPlayerFilter {
 
@@ -24,7 +22,7 @@ public class QMPlayerFilter {
      * @param numGamesPlayed filter out players who do not have this many games played
      * @return the list of filtered YR reports
      */
-    public static QMReport.YRReport[] filterPlayers(Path[] paths, int numGamesPlayed) throws IOException {
+    public static QMReport.YRReport[] filterPlayersByGamesPlayed(Path[] paths, int numGamesPlayed) throws IOException {
         Gson gson = new Gson();
 
         List<QMReport.YRReport> yrReports = new ArrayList<>();
@@ -87,5 +85,54 @@ public class QMPlayerFilter {
         logger.info("Filtered down to " + filteredReports.size() + " reports, players who did not have " + numGamesPlayed + " games played removed from dataset");
 
         return filteredReports.toArray(new QMReport.YRReport[0]);
+    }
+
+    /**
+     * @param yrReports
+     * @param rankMax
+     * @return reports only with players in the top rankMax
+     */
+    public static QMReport.YRReport[] filterPlayersByRank(QMReport.YRReport[] yrReports, int rankMax) {
+
+        TreeMap<String, Integer> playerPoints = new TreeMap<>();
+
+        for (QMReport.YRReport report : yrReports) {
+
+            for (QMReport.YRReport.YRPlayer player : report.getPlayers()) {
+                String name = player.getName();
+
+                if (playerPoints.containsKey(name)) {
+                    int count = playerPoints.get(name) + player.getPoints();
+                    playerPoints.put(name, count);
+                } else {
+                    playerPoints.put(name, player.getPoints());
+                }
+            }
+        }
+
+        List<String> keys = new ArrayList<>(playerPoints.keySet());
+        keys = keys.stream()
+                .sorted(Comparator.comparing(playerPoints::get).reversed())
+                .collect(Collectors.toList());
+
+        keys = keys.subList(0, rankMax); //this list will have the player names in the top rankMax
+
+        List<QMReport.YRReport> filteredReports = new ArrayList<>();
+        //============
+        for (QMReport.YRReport report : yrReports) {
+
+            String player1 = report.getPlayers()[0].getName();
+            String player2 = report.getPlayers()[1].getName();
+
+            if (keys.contains(player1) && keys.contains(player2)) {
+                filteredReports.add(report);
+            }
+        }
+
+        System.out.println();
+        System.out.println("Filtered reports down to players ranked in the top: " + rankMax);
+        System.out.println();
+
+        return filteredReports.toArray(new QMReport.YRReport[]{});
     }
 }

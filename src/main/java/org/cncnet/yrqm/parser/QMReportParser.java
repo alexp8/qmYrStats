@@ -3,13 +3,14 @@ package org.cncnet.yrqm.parser;
 import org.cncnet.yrqm.config.YRConfig;
 import org.cncnet.yrqm.model.QMReport;
 import org.cncnet.yrqm.model.YRCompiledReport;
-import org.cncnet.yrqm.model.YRComparator;
+import org.cncnet.yrqm.model.YRMapComparator;
 import org.cncnet.yrqm.model.enums.YRFactionEnum;
 import org.cncnet.yrqm.model.reports.YRAlliedVsYuriReport;
 import org.cncnet.yrqm.model.reports.YRSovVsAlliedReport;
 import org.cncnet.yrqm.model.reports.YRSovVsYuriReport;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class QMReportParser {
 
@@ -179,7 +180,7 @@ public class QMReportParser {
 
     public void generateTotalGamesPlayedPerMap(QMReport.YRReport[] yrReports_filtered) {
 
-        TreeMap<String, Integer> mapCounts = new TreeMap<>(new YRComparator());
+        TreeMap<String, Integer> mapCounts = new TreeMap<>(new YRMapComparator());
 
         for (QMReport.YRReport report : yrReports_filtered) {
             String mapName = report.getScen();
@@ -192,12 +193,45 @@ public class QMReportParser {
             }
         }
 
-        System.out.println("Games played per map");
-        System.out.println("");
+        System.out.println();
+        System.out.println("Games played per map:");
 
-        for (String mapName : mapCounts.keySet()) {
+        List<String> keys = new ArrayList<>(mapCounts.keySet());
+        keys = keys.stream()
+                .sorted(Comparator.comparing(mapCounts::get).reversed())
+                .collect(Collectors.toList());
+
+        for (String mapName : keys) {
             System.out.println(mapName + ": " + mapCounts.get(mapName));
         }
-        System.out.println("");
+        System.out.println();
+    }
+
+    public void generateNumberOfPlayers(QMReport.YRReport[] yrReports_filtered, int numGamesPlayed) {
+
+        TreeMap<String, Integer> playerCount = new TreeMap<>(new YRMapComparator());
+
+        for (QMReport.YRReport report : yrReports_filtered) {
+
+            for (QMReport.YRReport.YRPlayer player : report.getPlayers()) {
+                String name = player.getName();
+
+                if (playerCount.containsKey(name)) {
+                    int count = playerCount.get(name) + 1;
+                    playerCount.put(name, count);
+                } else {
+                    playerCount.put(name, 1);
+                }
+            }
+        }
+
+        List<String> keys = new ArrayList<>(playerCount.keySet());
+        keys = keys.stream()
+                .filter(a -> playerCount.get(a) >= numGamesPlayed)
+                .collect(Collectors.toList());
+
+        System.out.println();
+        System.out.println("Number of players with at least 10 games played: " + keys.size());
+        System.out.println();
     }
 }
