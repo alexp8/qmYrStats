@@ -25,7 +25,8 @@ hs_err_pid*
 #intellij
 .idea
 .iml
-*.json
 *.iml
 
 /target
+**/playerReports/
+**/qm-bulk/
