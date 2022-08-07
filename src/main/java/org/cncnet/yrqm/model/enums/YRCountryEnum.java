@@ -15,9 +15,9 @@ public enum YRCountryEnum {
     Libya("Libya"),
     Yuri("Yuri");
 
-    private String name;
+    private final String name;
 
-    private YRCountryEnum(String name) {
+    YRCountryEnum(String name) {
         this.name = name;
     }
 }

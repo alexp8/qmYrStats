@@ -12,10 +12,11 @@ import java.util.Properties;
 @Getter
 public class YRConfig {
 
-    private static final String yrPropertiesFileName = "/yr.properties";
+    private static final String yrPropertiesFileName = "/qm.properties";
 
     private final HashMap<Integer, YRCountryEnum> countries;
     private final HashMap<Integer, YRFactionEnum> factions;
+    private String[] ladders;
 
     public YRConfig() {
         countries = new HashMap<>();
@@ -30,6 +31,8 @@ public class YRConfig {
             properties.load(is);
 
             String value = properties.getProperty("yr.country.0");
+
+            ladders = properties.getProperty("ladders").split(",");
 
             countries.put(0, YRCountryEnum.valueOf(value));
             countries.put(1, YRCountryEnum.valueOf(properties.getProperty("yr.country.1")));

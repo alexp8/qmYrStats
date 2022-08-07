@@ -8,9 +8,9 @@ public enum YRFactionEnum {
     SOVIET("Soviet"),
     YURI("Yuri");
 
-    private String name;
+    private final String name;
 
-    private YRFactionEnum(String name) {
+    YRFactionEnum(String name) {
         this.name = name;
     }
 }
