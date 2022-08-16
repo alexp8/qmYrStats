@@ -278,14 +278,16 @@ public class QMReportParser {
         return players;
     }
 
-
     public void createPlayerMatchupStats(String game, QMReport[] qmReports, Path reportsFile, Map<String, List<String>> playerLookup) throws IOException {
         Set<String> players = getPlayerNames(qmReports);
 
-        //Loop through every player and calculate their matchup winrate vs opponents
+        List<QMPlayerMatchupReport> qmPlayerMatchupReports = new ArrayList<>();
+
+        //Loop through every player and calculate their matchup win/loss vs opponents
         for (String player : players) {
 
-            QMPlayerMatchupReport qmPlayerMatchupReport = new QMPlayerMatchupReport(game, player);
+            final String playerName = getRealName(playerLookup, player); //try and find the qm player's real name from the player name/nick lookup
+            QMPlayerMatchupReport qmPlayerMatchupReport = new QMPlayerMatchupReport(game, playerName);
 
             //Loop through every QM game report and tally player win/loss vs opponents
             for (QMReport qmReport : qmReports) {
@@ -303,9 +305,11 @@ public class QMReportParser {
                     continue;
                 }
 
+                final String opponentName = getRealName(playerLookup, opponent.getName()); //try and find the opponent's real name from the lookup
+
                 QMPlayerMatchupReport.QMPlayerMatchup qmPlayerMatchup = qmPlayerMatchupReport.getQmPlayerMatchup(opponent.getName());
                 if (qmPlayerMatchup == null) {
-                    qmPlayerMatchup = new QMPlayerMatchupReport.QMPlayerMatchup(opponent.getName());
+                    qmPlayerMatchup = new QMPlayerMatchupReport.QMPlayerMatchup(opponentName);
                     qmPlayerMatchupReport.addMatchup(qmPlayerMatchup);
                 }
 
@@ -316,23 +320,28 @@ public class QMReportParser {
             }
 
             if (!qmPlayerMatchupReport.getQmPlayerMatchupList().isEmpty())
-                writePlayerGameMatchupReports(reportsFile, qmPlayerMatchupReport, playerLookup);
+                qmPlayerMatchupReports.add(qmPlayerMatchupReport);
+        }
+
+        Collections.sort(qmPlayerMatchupReports); //sort the QM Player matchup reports alphabetically
+
+        for (QMPlayerMatchupReport qmPlayerMatchupReport : qmPlayerMatchupReports) {
+            writePlayerGameMatchupReports(reportsFile, qmPlayerMatchupReport);
         }
     }
 
-    public void writePlayerGameMatchupReports(Path path, QMPlayerMatchupReport qmPlayerMatchupReport, Map<String, List<String>> playerLookup) throws IOException {
-        String playerName = getRealName(playerLookup, qmPlayerMatchupReport.getPlayerName()); //try and find the qm player's real name from the lookup
-        if (playerName == null)
-            playerName = qmPlayerMatchupReport.getPlayerName();
+    /**
+     * Write the QM player matchup wins/losses data to a file
+     * @param path to write the QM player matchup data
+     * @param qmPlayerMatchupReport
+     * @throws IOException
+     */
+    public void writePlayerGameMatchupReports(Path path, QMPlayerMatchupReport qmPlayerMatchupReport) throws IOException {
 
+        //loop through the QmPlayerMatchups and log the wins/losses for the player vs opponents
         for (QMPlayerMatchupReport.QMPlayerMatchup qmPlayerMatchup : qmPlayerMatchupReport.getQmPlayerMatchupList()) {
-
-            String opponent = getRealName(playerLookup, qmPlayerMatchup.getOpponent()); //try and find the opponent's real name from the lookup
-            if (opponent == null)
-                opponent = qmPlayerMatchup.getOpponent();
-
-            String line = playerName + "," + qmPlayerMatchup.getMyWins() + ","
-                    + opponent + "," + qmPlayerMatchup.getOpponentWins() + System.getProperty("line.separator");
+            String line = qmPlayerMatchupReport.getPlayerName() + "," + qmPlayerMatchup.getMyWins() + ","
+                    + qmPlayerMatchup.getOpponent() + "," + qmPlayerMatchup.getOpponentWins() + System.getProperty("line.separator");
 
             Files.writeString(path, line, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         }
@@ -351,6 +360,6 @@ public class QMReportParser {
     public String getRealName(Map<String, List<String>> playerLookups, String nickname) {
         return playerLookups.keySet().stream()
                 .filter(x -> playerLookups.get(x).contains(nickname)) //does this nickname belong to a player
-                .findFirst().orElse(null);
+                .findFirst().orElse(nickname);
     }
 }

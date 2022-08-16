@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class QMPlayerMatchupReport {
+public class QMPlayerMatchupReport implements Comparable<QMPlayerMatchupReport> {
     private final String ladderGame;
     private final String playerName;
     private final List<QMPlayerMatchup> qmPlayerMatchupList;
@@ -21,8 +21,13 @@ public class QMPlayerMatchupReport {
         qmPlayerMatchupList.add(qmPlayerMatchup);
     }
 
+    @Override
+    public int compareTo(QMPlayerMatchupReport o) {
+        return playerName.compareTo(o.playerName);
+    }
+
     @Getter
-    public static class QMPlayerMatchup {
+    public static class QMPlayerMatchup implements Comparable<QMPlayerMatchup> {
         private final String opponent;
         private int myWins;
         private int opponentWins;
@@ -37,6 +42,11 @@ public class QMPlayerMatchupReport {
 
         public void incrementOpponentWins() {
             opponentWins++;
+        }
+
+        @Override
+        public int compareTo(QMPlayerMatchup o) {
+            return opponent.compareTo(o.opponent);
         }
     }
 

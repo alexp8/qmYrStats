@@ -32,11 +32,11 @@ public class QMReportMain {
         final QMReportParser qmReportParser = new QMReportParser();
 
         final QMGame[] qmGames = new QMGame[]{
-                QMGame.RA2,
-                QMGame.YR,
-                QMGame.RA,
-                QMGame.TS,
-                QMGame.SFJ,
+//                QMGame.RA2,
+//                QMGame.YR,
+//                QMGame.RA,
+//                QMGame.TS,
+//                QMGame.SFJ,
                 QMGame.BLITZ};
 
         final QMGame[] qmGamesPlayerMatchupReports = new QMGame[]{ //generate player matchup reports for listed ladder games
@@ -70,9 +70,9 @@ public class QMReportMain {
 
             qmReportParser.generateTotalGamesPlayedPerMap(gameReports_filtered); //calculate how many maps played on each map
 
-//            qmReportParser.parseReportsByMap(gameReports_filtered); //calculate  the wins by each side per map
+            qmReportParser.parseReportsByMap(gameReports_filtered); //calculate the wins by each side per map
 
-            QMElo.generateElo(gameReports_filtered, 1000); //generate ELO ratings for each faction on each map
+//            QMElo.generateElo(gameReports_filtered, 1000); //generate ELO ratings for each faction on each map
 
             if (Arrays.stream(qmGamesPlayerMatchupReports)
                     .anyMatch(x -> x.getGame().equals(qmGame.getGame())))
