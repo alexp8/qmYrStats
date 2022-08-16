@@ -28,12 +28,12 @@ public class QMPlayerMatchupReport implements Comparable<QMPlayerMatchupReport> 
 
     @Getter
     public static class QMPlayerMatchup implements Comparable<QMPlayerMatchup> {
-        private final String opponent;
+        private final String opponentName;
         private int myWins;
         private int opponentWins;
 
-        public QMPlayerMatchup(String opponent) {
-            this.opponent = opponent;
+        public QMPlayerMatchup(String opponentName) {
+            this.opponentName = opponentName;
         }
 
         public void incrementMyWins() {
@@ -46,13 +46,13 @@ public class QMPlayerMatchupReport implements Comparable<QMPlayerMatchupReport> 
 
         @Override
         public int compareTo(QMPlayerMatchup o) {
-            return opponent.compareTo(o.opponent);
+            return opponentName.compareTo(o.opponentName);
         }
     }
 
     public QMPlayerMatchup getQmPlayerMatchup(String opponent) {
         return qmPlayerMatchupList.stream()
-                .filter(x -> x.getOpponent().equals(opponent))
+                .filter(x -> x.getOpponentName().equals(opponent))
                 .findFirst().orElse(null);
     }
 }

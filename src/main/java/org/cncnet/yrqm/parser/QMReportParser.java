@@ -307,7 +307,7 @@ public class QMReportParser {
 
                 final String opponentName = getRealName(playerLookup, opponent.getName()); //try and find the opponent's real name from the lookup
 
-                QMPlayerMatchupReport.QMPlayerMatchup qmPlayerMatchup = qmPlayerMatchupReport.getQmPlayerMatchup(opponent.getName());
+                QMPlayerMatchupReport.QMPlayerMatchup qmPlayerMatchup = qmPlayerMatchupReport.getQmPlayerMatchup(opponentName);
                 if (qmPlayerMatchup == null) {
                     qmPlayerMatchup = new QMPlayerMatchupReport.QMPlayerMatchup(opponentName);
                     qmPlayerMatchupReport.addMatchup(qmPlayerMatchup);
@@ -318,6 +318,8 @@ public class QMReportParser {
                 else if (opponent.getWon() == 1)
                     qmPlayerMatchup.incrementOpponentWins();
             }
+
+            Collections.sort(qmPlayerMatchupReport.getQmPlayerMatchupList());
 
             if (!qmPlayerMatchupReport.getQmPlayerMatchupList().isEmpty())
                 qmPlayerMatchupReports.add(qmPlayerMatchupReport);
@@ -341,7 +343,7 @@ public class QMReportParser {
         //loop through the QmPlayerMatchups and log the wins/losses for the player vs opponents
         for (QMPlayerMatchupReport.QMPlayerMatchup qmPlayerMatchup : qmPlayerMatchupReport.getQmPlayerMatchupList()) {
             String line = qmPlayerMatchupReport.getPlayerName() + "," + qmPlayerMatchup.getMyWins() + ","
-                    + qmPlayerMatchup.getOpponent() + "," + qmPlayerMatchup.getOpponentWins() + System.getProperty("line.separator");
+                    + qmPlayerMatchup.getOpponentName() + "," + qmPlayerMatchup.getOpponentWins() + System.getProperty("line.separator");
 
             Files.writeString(path, line, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         }

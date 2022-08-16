@@ -82,30 +82,36 @@ public class QMReportMain {
 
     /**
      * Generate the player matchup winrate data
-     * @param qmGame ladder game
-     * @param qmReportParser qm parser
+     *
+     * @param qmGame               ladder game
+     * @param qmReportParser       qm parser
      * @param gameReports_filtered qm reports
      * @throws IOException throw exception
      */
     private static void generatePlayerMatchupReports(QMGame qmGame, QMReportParser qmReportParser, QMReport[] gameReports_filtered) throws IOException {
         Map<String, List<String>> playerLookups = new HashMap<>();
-        Path lookupPath = Paths.get("src", "main", "resources", "lookup", qmGame.getGame() + ".json");
+        Path lookupPath = Paths.get("src", "main", "resources", "lookup", qmGame.getGame() + "_lookup.json");
         if (Files.exists(lookupPath)) {
             String content = Files.readString(lookupPath, StandardCharsets.UTF_8);
             playerLookups = PlayerLookup.getPlayerLookups(content);
         }
 
         Path playersDirPath = Paths.get("src", "main", "resources", "playerReports");
-        Path reportsFile = Paths.get(playersDirPath.toAbsolutePath().toString(), qmGame.getGame() + ".csv");
+        Path blitzFile = Paths.get(playersDirPath.toAbsolutePath().toString(), qmGame.getGame());
+        if (!Files.exists(blitzFile))
+            Files.createDirectory(blitzFile);
+        Path reportsFile = Paths.get(blitzFile.toAbsolutePath().toString(), qmGame.getGame() + ".csv");
 
-        if (!Files.exists(reportsFile)) {
-            try {
-                Files.createFile(reportsFile.toAbsolutePath());
-                final String header = "PlayerA,PlayerAWins,PlayerB,PlayerBWins";
-                Files.writeString(reportsFile, header + System.getProperty("line.separator"), StandardCharsets.UTF_8, StandardOpenOption.APPEND);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to create file at: " + reportsFile, e);
-            }
+        if (Files.exists(reportsFile)) {
+            Files.delete(reportsFile);
+        }
+
+        try {
+            Files.createFile(reportsFile.toAbsolutePath());
+            final String header = "PlayerA,PlayerAWins,PlayerB,PlayerBWins";
+            Files.writeString(reportsFile, header + System.getProperty("line.separator"), StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create file at: " + reportsFile, e);
         }
 
         qmReportParser.createPlayerMatchupStats(qmGame.getGame(), gameReports_filtered, reportsFile, playerLookups);
